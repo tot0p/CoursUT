@@ -10,4 +10,5 @@ func (serv *Server) handlers() {
 	api := serv.fiberApp.Group("/api")
 	api.Get("/ping", apiHandler.PingHandler)
 	api.Post("/vehicles", apiHandler.AddVehicleHandler)
+	api.Get("/vehicles", apiHandler.GetVehiclesHandler)
 }
