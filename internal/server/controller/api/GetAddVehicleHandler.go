@@ -5,6 +5,7 @@ import (
 	"github.com/tot0p/CoursUT/internal/server/models/api"
 )
 
+// GetAddVehicleHandler returns a handler for the /api/vehicles route
 func GetAddVehicleHandler() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 
