@@ -1,0 +1,116 @@
+package database
+
+import (
+	"context"
+	"database/sql"
+	"fmt"
+	_ "github.com/marcboeker/go-duckdb"
+)
+
+type DbConn struct {
+	*sql.Conn
+}
+
+var Conn DbConn
+
+// InitDatabase initializes the database
+func InitDatabase() error {
+	var err error
+	db, err := sql.Open("duckdb", "")
+	Conn.Conn, err = db.Conn(context.Background())
+	if err != nil {
+		return err
+	}
+	err = initSchema()
+	if err != nil {
+		return err
+	}
+	// select all tables
+	fmt.Println(Conn.ExecContext(context.Background(), "SHOW TABLES;"))
+	return nil
+}
+
+func InitDatabaseFromDump(path string) error {
+	var err error
+	db, err := sql.Open("duckdb", "")
+	Conn.Conn, err = db.Conn(context.Background())
+	if err != nil {
+		return err
+	}
+	_, err = Conn.ExecContext(context.Background(), "IMPORT DATABASE ?", path)
+	return nil
+}
+
+func DumpDatabase() error {
+	_, err := Conn.ExecContext(context.Background(), "DUMP DATABASE TO './dbDump';")
+	return err
+}
+
+func initSchema() error {
+	transac, err := Conn.BeginTx(context.Background(), nil)
+	if err != nil {
+		transac.Rollback()
+		return err
+	}
+	err = CreateTableVehicle()
+	if err != nil {
+		transac.Rollback()
+		return err
+	}
+	err = CreateTableParkingSpace()
+	if err != nil {
+		transac.Rollback()
+		return err
+	}
+	err = CreateTableParkingSpaceInformation()
+	if err != nil {
+		transac.Rollback()
+		return err
+	}
+	err = transac.Commit()
+	if err != nil {
+		transac.Rollback()
+		return err
+	}
+	return nil
+}
+
+func CreateTableParkingSpace() error {
+	query := `
+	CREATE SEQUENCE id_parking_space START 1;
+	CREATE TABLE IF NOT EXISTS parking_space (
+		id INT PRIMARY KEY DEFAULT NEXTVAL('id_parking_space'),
+		space_number TEXT UNIQUE NOT NULL
+	);`
+	_, err := Conn.ExecContext(context.Background(), query)
+	return err
+}
+
+func CreateTableParkingSpaceInformation() error {
+	query := `
+	CREATE SEQUENCE id_parking_space_information START 1;
+	CREATE TABLE IF NOT EXISTS parking_space_information (
+		id INT PRIMARY KEY DEFAULT nextval('id_parking_space_information'),
+		vehicle_id INT NOT NULL,
+		parking_space_id INT NOT NULL,
+		arrival_time TIMESTAMP NOT NULL,
+		departure_time TIMESTAMP NOT NULL,
+		parking_duration INTERVAL NOT NULL,
+        CONSTRAINT fk_vehicle_id FOREIGN KEY (vehicle_id) REFERENCES vehicle(id),
+        CONSTRAINT fk_parking_space_id FOREIGN KEY (parking_space_id) REFERENCES parking_space(id)
+	);`
+	_, err := Conn.ExecContext(context.Background(), query)
+	return err
+}
+
+func CreateTableVehicle() error {
+	query := `
+	CREATE SEQUENCE id_vehicle START 1;
+	CREATE TABLE IF NOT EXISTS vehicle (
+		id INT PRIMARY KEY DEFAULT NEXTVAL('id_vehicle'),
+		plate TEXT NOT NULL,
+		vehicle_type INT NOT NULL
+	);`
+	_, err := Conn.ExecContext(context.Background(), query)
+	return err
+}
