@@ -3,6 +3,7 @@ package models
 type VehicleType int
 
 const (
-	Car VehicleType = iota
+	Unknown VehicleType = iota
+	Car
 	Truck
 )
