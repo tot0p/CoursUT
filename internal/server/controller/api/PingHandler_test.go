@@ -8,9 +8,9 @@ import (
 	"testing"
 )
 
-func TestGetPingHandler(t *testing.T) {
+func TestPingHandler(t *testing.T) {
 	app := fiber.New()
-	app.Get("/api/ping", GetPingHandler())
+	app.Get("/api/ping", PingHandler)
 	req, _ := http.NewRequest("GET", "/api/ping", nil)
 	res, err := app.Test(req)
 	assert.Equalf(t, false, err != nil, "Expected status code 200, but got %v", res.StatusCode)

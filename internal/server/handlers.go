@@ -8,6 +8,6 @@ func (serv *Server) handlers() {
 
 	// api group
 	api := serv.fiberApp.Group("/api")
-	api.Get("/ping", apiHandler.GetPingHandler())
-	api.Post("/vehicles", apiHandler.GetAddVehicleHandler())
+	api.Get("/ping", apiHandler.PingHandler)
+	api.Post("/vehicles", apiHandler.AddVehicleHandler)
 }
