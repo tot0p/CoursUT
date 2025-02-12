@@ -3,15 +3,14 @@ package database
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	_ "github.com/marcboeker/go-duckdb"
 )
 
-type DbConn struct {
+type dbConn struct {
 	*sql.Conn
 }
 
-var Conn DbConn
+var Conn dbConn
 
 // InitDatabase initializes the database
 func InitDatabase() error {
@@ -28,14 +27,13 @@ func InitDatabase() error {
 	if err != nil {
 		return err
 	}
-	// select all tables
-	fmt.Println(Conn.ExecContext(context.Background(), "SHOW TABLES;"))
 	return nil
 }
 
-func InitDatabaseFromDump(path string) error {
+// InitDatabaseFromFilename creates or opens a database file
+func InitDatabaseFromFilename(filename string) error {
 	var err error
-	db, err := sql.Open("duckdb", "")
+	db, err := sql.Open("duckdb", filename)
 	if err != nil {
 		return err
 	}
@@ -43,16 +41,11 @@ func InitDatabaseFromDump(path string) error {
 	if err != nil {
 		return err
 	}
-	_, err = Conn.ExecContext(context.Background(), "IMPORT DATABASE ?", path)
+	err = initSchema()
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func DumpDatabase() error {
-	_, err := Conn.ExecContext(context.Background(), "DUMP DATABASE TO './dbDump';")
-	return err
 }
 
 func initSchema() error {

@@ -48,3 +48,13 @@ func GetVehicles() ([]models.Vehicle, error) {
 	}
 	return vehicles, nil
 }
+
+func DeleteVehicle(id int) error {
+	_, err := database.Conn.ExecContext(context.Background(), "DELETE FROM vehicle WHERE id = ?;", id)
+	return err
+}
+
+func UpdateVehicle(vehicle *models.Vehicle) error {
+	_, err := database.Conn.ExecContext(context.Background(), "UPDATE vehicle SET plate = ?, vehicle_type = ? WHERE id = ?;", vehicle.Plate, vehicle.VehicleType, vehicle.ID)
+	return err
+}
