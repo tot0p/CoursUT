@@ -17,6 +17,9 @@ var Conn DbConn
 func InitDatabase() error {
 	var err error
 	db, err := sql.Open("duckdb", "")
+	if err != nil {
+		return err
+	}
 	Conn.Conn, err = db.Conn(context.Background())
 	if err != nil {
 		return err
@@ -33,11 +36,17 @@ func InitDatabase() error {
 func InitDatabaseFromDump(path string) error {
 	var err error
 	db, err := sql.Open("duckdb", "")
+	if err != nil {
+		return err
+	}
 	Conn.Conn, err = db.Conn(context.Background())
 	if err != nil {
 		return err
 	}
 	_, err = Conn.ExecContext(context.Background(), "IMPORT DATABASE ?", path)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -49,27 +58,42 @@ func DumpDatabase() error {
 func initSchema() error {
 	transac, err := Conn.BeginTx(context.Background(), nil)
 	if err != nil {
-		transac.Rollback()
+		err1 := transac.Rollback()
+		if err1 != nil {
+			return err1
+		}
 		return err
 	}
 	err = CreateTableVehicle()
 	if err != nil {
-		transac.Rollback()
+		err1 := transac.Rollback()
+		if err1 != nil {
+			return err1
+		}
 		return err
 	}
 	err = CreateTableParkingSpace()
 	if err != nil {
-		transac.Rollback()
+		err1 := transac.Rollback()
+		if err1 != nil {
+			return err1
+		}
 		return err
 	}
 	err = CreateTableParkingSpaceInformation()
 	if err != nil {
-		transac.Rollback()
+		err1 := transac.Rollback()
+		if err1 != nil {
+			return err1
+		}
 		return err
 	}
 	err = transac.Commit()
 	if err != nil {
-		transac.Rollback()
+		err1 := transac.Rollback()
+		if err1 != nil {
+			return err1
+		}
 		return err
 	}
 	return nil
