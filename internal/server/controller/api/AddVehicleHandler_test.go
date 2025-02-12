@@ -26,9 +26,9 @@ func TestAddVehicleHandler(t *testing.T) {
 		{
 			description:   "Working request add vehicle",
 			expectedError: false,
-			body:          "{\"plate\":\"ABCDZ2\",\"Type\":0}",
+			body:          "{\"plate\":\"AA-123-AA\",\"vehicleType\":1}",
 			expectedCode:  201,
-			expectedBody:  "{\"id\":0,\"plate\":\"ABCDZ2\",\"vehicleType\":0}",
+			expectedBody:  "{\"id\":0,\"plate\":\"AA-123-AA\",\"vehicleType\":1}",
 		},
 		{
 			description:   "Bad request add vehicle",
@@ -36,6 +36,27 @@ func TestAddVehicleHandler(t *testing.T) {
 			expectedCode:  400,
 			body:          "",
 			expectedBody:  "{\"error\":\"Cannot parse input\"}",
+		},
+		{
+			description:   "Bad request add vehicle without plate",
+			expectedError: false,
+			expectedCode:  400,
+			body:          "{\"plate\":\"\",\"vehicleType\":1}",
+			expectedBody:  "{\"error\":\"Plate is required\"}",
+		},
+		{
+			description:   "Bad request add vehicle without good type",
+			expectedError: false,
+			expectedCode:  400,
+			body:          "{\"plate\":\"AA-123-AA\",\"vehicleType\":100}",
+			expectedBody:  "{\"error\":\"Type is required and must be different of Unknown\"}",
+		},
+		{
+			description:   "Bad request add vehicle bad plate",
+			expectedError: false,
+			expectedCode:  400,
+			body:          "{\"plate\":\"VROOOOOOOM\",\"vehicleType\":1}",
+			expectedBody:  "{\"error\":\"Plate is not valid\"}",
 		},
 	}
 	err := database.InitDatabase()

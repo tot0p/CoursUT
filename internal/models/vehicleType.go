@@ -7,3 +7,7 @@ const (
 	Car
 	Truck
 )
+
+func IsValidVehicleType(value int) bool {
+	return value >= int(Unknown) && value <= int(Truck)
+}
