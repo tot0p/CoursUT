@@ -1,16 +1,18 @@
-package server
+package api
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"testing"
 )
 
-func TestIndexRoute(t *testing.T) {
-	serv := NewServer()
+func TestGetPingHandler(t *testing.T) {
+	app := fiber.New()
+	app.Get("/api/ping", GetPingHandler())
 	req, _ := http.NewRequest("GET", "/api/ping", nil)
-	res, err := serv.fiberApp.Test(req)
+	res, err := app.Test(req)
 	assert.Equalf(t, false, err != nil, "Expected status code 200, but got %v", res.StatusCode)
 	assert.Equalf(t, 200, res.StatusCode, "Expected status code 200, but got %v", res.StatusCode)
 	body, err := io.ReadAll(res.Body)
