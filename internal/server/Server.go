@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"log"
 )
 
 type Server struct {
@@ -18,12 +19,10 @@ func NewServer() *Server {
 		TimeFormat: "02-Jan-2006 15:04:05",
 		TimeZone:   "Local",
 	}))
+	serv.handlers()
 	return serv
 }
 
 func (serv *Server) Run() {
-	serv.handlers()
-	if err := serv.fiberApp.Listen(":8080"); err != nil {
-		panic(err)
-	}
+	log.Fatal(serv.fiberApp.Listen(":8080"))
 }
