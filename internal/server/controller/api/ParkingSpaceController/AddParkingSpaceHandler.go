@@ -6,6 +6,7 @@ import (
 	"github.com/tot0p/CoursUT/internal/models"
 )
 
+// AddParkingSpaceHandler is the handler at /api/parking-spaces for add a parking space
 func AddParkingSpaceHandler(c *fiber.Ctx) error {
 	// Body parsing
 	var Input models.ParkingSpace
