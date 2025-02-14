@@ -301,6 +301,9 @@ func TestUpdateParkingSpaceInformationNotFound(t *testing.T) {
 			t.Error(err)
 		}
 	}()
+	if err != nil {
+		t.Error(err)
+	}
 	err = UpdateParkingSpaceInformation(&models.ParkingSpaceInformation{})
 	if err == nil {
 		t.Error("Parking space information was found")
