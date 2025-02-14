@@ -1,4 +1,4 @@
-package api
+package VehicleController
 
 import (
 	"github.com/gofiber/fiber/v2"
