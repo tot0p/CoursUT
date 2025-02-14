@@ -16,5 +16,7 @@ func (serv *Server) handlers() {
 	api.Delete("/vehicles/:id", VehicleController.DeleteVehicleHandler)
 	api.Put("/vehicles/:id", VehicleController.UpdateVehicleHandler)
 
+	api.Get("/parking-spaces", ParkingSpaceController.GetParkingSpacesHandler)
 	api.Post("/parking-spaces", ParkingSpaceController.AddParkingSpaceHandler)
+
 }
