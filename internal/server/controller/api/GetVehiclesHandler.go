@@ -13,7 +13,7 @@ func GetVehiclesHandler(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-	if vehicles == nil || len(vehicles) == 0 {
+	if len(vehicles) == 0 {
 		return c.Status(fiber.StatusNoContent).Send(nil)
 	}
 	return c.JSON(vehicles)

@@ -62,9 +62,12 @@ func TestGetVehiclesHandler(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.Nilf(t, err, test.description)
 		assert.Equalf(t, test.expectedBody, string(body), test.description)
-		vehicle.CreateVehicle(&models.Vehicle{
+		_, err = vehicle.CreateVehicle(&models.Vehicle{
 			Plate:       "AA-123-AA",
 			VehicleType: models.Car,
 		})
+		if err != nil {
+			panic(err)
+		}
 	}
 }
