@@ -11,4 +11,5 @@ func (serv *Server) handlers() {
 	api.Get("/ping", apiHandler.PingHandler)
 	api.Post("/vehicles", apiHandler.AddVehicleHandler)
 	api.Get("/vehicles", apiHandler.GetVehiclesHandler)
+	api.Delete("/vehicles/:id", apiHandler.DeleteVehicleHandler)
 }
