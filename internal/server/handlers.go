@@ -18,5 +18,5 @@ func (serv *Server) handlers() {
 
 	api.Get("/parking-spaces", ParkingSpaceController.GetParkingSpacesHandler)
 	api.Post("/parking-spaces", ParkingSpaceController.AddParkingSpaceHandler)
-
+	api.Delete("/parking-spaces/:id", ParkingSpaceController.DeleteParkingSpacesHandler)
 }

@@ -137,3 +137,64 @@ func TestAddVehicleHandler(t *testing.T) {
 		assert.Equalf(t, test.expectedBody, string(body), test.description)
 	}
 }
+
+func TestDeleteParkingSpacesHandler(t *testing.T) {
+	var route = "/api/parking-spaces/:id"
+	var routeValue = "/api/parking-spaces/1"
+	tests := []struct {
+		description string
+
+		// Test input
+		body string
+
+		// Expected output
+		expectedError bool
+		expectedCode  int
+		expectedBody  string
+	}{
+		{
+			description:   "Working request add parking-spaces",
+			expectedError: false,
+			expectedCode:  204,
+			body:          "",
+			expectedBody:  "",
+		},
+		{
+			description:   "Not exist request Get parking-spaces",
+			expectedError: false,
+			body:          "",
+			expectedCode:  404,
+			expectedBody:  "{\"error\":\"Parking space not found\"}",
+		},
+	}
+	err := database.InitDatabase()
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = parkingSpace.CreateParkingSpace(&models.ParkingSpace{
+		SpaceNumber: "A001",
+	})
+	if err != nil {
+		panic(err)
+	}
+	app := fiber.New()
+	app.Delete(route, DeleteParkingSpacesHandler)
+	for _, test := range tests {
+		req, _ := http.NewRequest(
+			"DELETE",
+			routeValue,
+			nil,
+		)
+		req.Header.Set("Content-Type", "application/json")
+		res, err := app.Test(req, -1)
+		assert.Equalf(t, test.expectedError, err != nil, test.description)
+		if test.expectedError {
+			continue
+		}
+		assert.Equalf(t, test.expectedCode, res.StatusCode, test.description)
+		body, err := io.ReadAll(res.Body)
+		assert.Nilf(t, err, test.description)
+		assert.Equalf(t, test.expectedBody, string(body), test.description)
+	}
+}
