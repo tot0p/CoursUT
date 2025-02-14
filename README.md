@@ -1,6 +1,7 @@
 # CoursUT
 
-
+[![test & build](https://github.com/tot0p/CoursUT/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tot0p/CoursUT/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/tot0p/CoursUT/graph/badge.svg?token=DYEN01ALDK)](https://codecov.io/gh/tot0p/CoursUT)
 
 ## 1 Gestion d’un Parking Intelligent
 
