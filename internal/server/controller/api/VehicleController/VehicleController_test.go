@@ -187,7 +187,7 @@ func TestGetVehiclesHandler(t *testing.T) {
 	}
 	app := fiber.New()
 	app.Get(route, GetVehiclesHandler)
-	for _, test := range tests {
+	for i, test := range tests {
 		req, _ := http.NewRequest(
 			"GET",
 			routeValue,
@@ -203,12 +203,14 @@ func TestGetVehiclesHandler(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.Nilf(t, err, test.description)
 		assert.Equalf(t, test.expectedBody, string(body), test.description)
-		_, err = vehicle.CreateVehicle(&models.Vehicle{
-			Plate:       "AA-123-AA",
-			VehicleType: models.Car,
-		})
-		if err != nil {
-			panic(err)
+		if i == 0 {
+			_, err = vehicle.CreateVehicle(&models.Vehicle{
+				Plate:       "AA-123-AA",
+				VehicleType: models.Car,
+			})
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 }

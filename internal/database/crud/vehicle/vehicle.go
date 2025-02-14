@@ -2,6 +2,7 @@ package vehicle
 
 import (
 	"context"
+	"fmt"
 	"github.com/tot0p/CoursUT/internal/database"
 	"github.com/tot0p/CoursUT/internal/models"
 )
@@ -42,15 +43,44 @@ func GetVehicles() ([]models.Vehicle, error) {
 		}
 		vehicles = append(vehicles, vehicle)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error while scanning rows: %w", err)
+	}
 	return vehicles, nil
 }
 
 func DeleteVehicle(id int) error {
-	_, err := database.Conn.ExecContext(context.Background(), "DELETE FROM vehicle WHERE id = ?;", id)
-	return err
+	res, err := database.Conn.ExecContext(context.Background(), "DELETE FROM vehicle WHERE id = ?;", id)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf("vehicle with id %d not found", id)
+	}
+	return nil
 }
 
 func UpdateVehicle(vehicle *models.Vehicle) error {
-	_, err := database.Conn.ExecContext(context.Background(), "UPDATE vehicle SET plate = ?, vehicle_type = ? WHERE id = ?;", vehicle.Plate, vehicle.VehicleType, vehicle.ID)
-	return err
+	// to Update Use a Delete ... Return ... and a Create
+	res, err := database.Conn.ExecContext(context.Background(), "DELETE FROM vehicle WHERE id = ?;", vehicle.ID)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf("vehicle with id %d not found", vehicle.ID)
+	}
+	res2 := database.Conn.QueryRowContext(context.Background(), "INSERT INTO vehicle (id,plate, vehicle_type) VALUES (?,?, ?) RETURNING id;", vehicle.ID, vehicle.Plate, vehicle.VehicleType)
+	err = res2.Scan(&vehicle.ID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
