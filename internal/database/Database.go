@@ -94,7 +94,7 @@ func initSchema() error {
 
 func CreateTableParkingSpace() error {
 	query := `
-	CREATE SEQUENCE id_parking_space START 1;
+	CREATE SEQUENCE IF NOT EXISTS id_parking_space START 1;
 	CREATE TABLE IF NOT EXISTS parking_space (
 		id INT PRIMARY KEY DEFAULT NEXTVAL('id_parking_space'),
 		space_number TEXT UNIQUE NOT NULL
@@ -105,7 +105,7 @@ func CreateTableParkingSpace() error {
 
 func CreateTableParkingSpaceInformation() error {
 	query := `
-	CREATE SEQUENCE id_parking_space_information START 1;
+	CREATE SEQUENCE IF NOT EXISTS id_parking_space_information START 1;
 	CREATE TABLE IF NOT EXISTS parking_space_information (
 		id INT PRIMARY KEY DEFAULT nextval('id_parking_space_information'),
 		vehicle_id INT NOT NULL,
@@ -122,7 +122,7 @@ func CreateTableParkingSpaceInformation() error {
 
 func CreateTableVehicle() error {
 	query := `
-	CREATE SEQUENCE id_vehicle START 1;
+	CREATE SEQUENCE IF NOT EXISTS id_vehicle START 1;
 	CREATE TABLE IF NOT EXISTS vehicle (
 		id INT PRIMARY KEY DEFAULT NEXTVAL('id_vehicle'),
 		plate TEXT NOT NULL,

@@ -7,15 +7,11 @@ import (
 )
 
 func CreateParkingSpace(parkingSpace *models.ParkingSpace) (*models.ParkingSpace, error) {
-	res, err := database.Conn.ExecContext(context.Background(), "INSERT INTO parking_space (space_number) VALUES (?);", parkingSpace.SpaceNumber)
+	res := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space (space_number) VALUES (?) RETURNING id;", parkingSpace.SpaceNumber)
+	err := res.Scan(&parkingSpace.ID)
 	if err != nil {
 		return nil, err
 	}
-	tempId, err := res.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-	parkingSpace.ID = int(tempId)
 	return parkingSpace, nil
 }
 
