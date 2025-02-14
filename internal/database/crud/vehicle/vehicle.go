@@ -8,15 +8,11 @@ import (
 
 // CreateVehicle creates a vehicle in the database
 func CreateVehicle(vehicle *models.Vehicle) (*models.Vehicle, error) {
-	res, err := database.Conn.ExecContext(context.Background(), "INSERT INTO vehicle (plate, vehicle_type) VALUES (?, ?);", vehicle.Plate, vehicle.VehicleType)
+	res := database.Conn.QueryRowContext(context.Background(), "INSERT INTO vehicle (plate, vehicle_type) VALUES (?, ?) RETURNING id;", vehicle.Plate, vehicle.VehicleType)
+	err := res.Scan(&vehicle.ID)
 	if err != nil {
 		return nil, err
 	}
-	tempId, err := res.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-	vehicle.ID = int(tempId)
 	return vehicle, nil
 }
 

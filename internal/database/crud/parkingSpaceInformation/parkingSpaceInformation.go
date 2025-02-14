@@ -9,15 +9,11 @@ import (
 
 func CreateParkingSpaceInformation(information *models.ParkingSpaceInformation) (*models.ParkingSpaceInformation, error) {
 	information.ArrivalTime = time.Now()
-	res, err := database.Conn.ExecContext(context.Background(), "INSERT INTO parking_space_information (parking_space_id, vehicle_id, arrival_time, parking_duration) VALUES (?, ?, ?, ?);", information.ParkingSpaceID, information.VehicleID, information.ArrivalTime, information.ParkingDuration)
+	res := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space_information (parking_space_id, vehicle_id, arrival_time, parking_duration) VALUES (?, ?, ?, ?) RETURNING id;", information.ParkingSpaceID, information.VehicleID, information.ArrivalTime, information.ParkingDuration)
+	err := res.Scan(&information.ID)
 	if err != nil {
 		return nil, err
 	}
-	tempId, err := res.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-	information.ID = int(tempId)
 	return information, nil
 }
 
