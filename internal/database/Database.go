@@ -30,6 +30,10 @@ func InitDatabase() error {
 	return nil
 }
 
+func CloseDatabase() error {
+	return Conn.Close()
+}
+
 // InitDatabaseFromFilename creates or opens a database file
 func InitDatabaseFromFilename(filename string) error {
 	var err error
@@ -111,8 +115,8 @@ func CreateTableParkingSpaceInformation() error {
 		vehicle_id INT NOT NULL,
 		parking_space_id INT NOT NULL,
 		arrival_time TIMESTAMP NOT NULL,
-		departure_time TIMESTAMP NOT NULL,
-		parking_duration INTERVAL NOT NULL,
+		departure_time TIMESTAMP DEFAULT 'epoch'::TIMESTAMP,
+		parking_duration BIGINT Default 0,
         CONSTRAINT fk_vehicle_id FOREIGN KEY (vehicle_id) REFERENCES vehicle(id),
         CONSTRAINT fk_parking_space_id FOREIGN KEY (parking_space_id) REFERENCES parking_space(id)
 	);`
@@ -125,7 +129,7 @@ func CreateTableVehicle() error {
 	CREATE SEQUENCE IF NOT EXISTS id_vehicle START 1;
 	CREATE TABLE IF NOT EXISTS vehicle (
 		id INT PRIMARY KEY DEFAULT NEXTVAL('id_vehicle'),
-		plate TEXT NOT NULL,
+		plate TEXT UNIQUE NOT NULL,
 		vehicle_type INT NOT NULL
 	);`
 	_, err := Conn.ExecContext(context.Background(), query)

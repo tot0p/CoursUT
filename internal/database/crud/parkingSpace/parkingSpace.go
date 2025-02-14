@@ -2,6 +2,7 @@ package parkingSpace
 
 import (
 	"context"
+	"fmt"
 	"github.com/tot0p/CoursUT/internal/database"
 	"github.com/tot0p/CoursUT/internal/models"
 )
@@ -39,15 +40,44 @@ func GetParkingSpaces() ([]models.ParkingSpace, error) {
 		}
 		parkingSpaces = append(parkingSpaces, parkingSpace)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error while scanning rows: %w", err)
+	}
 	return parkingSpaces, nil
 }
 
 func DeleteParkingSpace(id int) error {
-	_, err := database.Conn.ExecContext(context.Background(), "DELETE FROM parking_space WHERE id = ?;", id)
-	return err
+	res, err := database.Conn.ExecContext(context.Background(), "DELETE FROM parking_space WHERE id = ?;", id)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf("parking space with id %d not found", id)
+	}
+	return nil
 }
 
 func UpdateParkingSpace(parkingSpace *models.ParkingSpace) error {
-	_, err := database.Conn.ExecContext(context.Background(), "UPDATE parking_space SET space_number = ? WHERE id = ?;", parkingSpace.SpaceNumber, parkingSpace.ID)
-	return err
+	// to Update Use a Delete ... Return ... and a Create
+	res, err := database.Conn.ExecContext(context.Background(), "DELETE FROM parking_space WHERE id = ?;", parkingSpace.ID)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf("parking space with id %d not found", parkingSpace.ID)
+	}
+	res2 := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space (id, space_number) VALUES (?, ?) RETURNING id;", parkingSpace.ID, parkingSpace.SpaceNumber)
+	err = res2.Scan(&parkingSpace.ID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
