@@ -28,7 +28,7 @@ func TestAddVehicleHandler(t *testing.T) {
 			expectedError: false,
 			body:          "{\"plate\":\"AA-123-AA\",\"vehicleType\":1}",
 			expectedCode:  201,
-			expectedBody:  "{\"id\":0,\"plate\":\"AA-123-AA\",\"vehicleType\":1}",
+			expectedBody:  "{\"id\":1,\"plate\":\"AA-123-AA\",\"vehicleType\":1}",
 		},
 		{
 			description:   "Bad request add vehicle",
