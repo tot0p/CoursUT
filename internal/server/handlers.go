@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/tot0p/CoursUT/internal/server/controller/api/ParkingSpaceController"
 	"github.com/tot0p/CoursUT/internal/server/controller/api/VehicleController"
 )
 
@@ -13,4 +14,6 @@ func (serv *Server) handlers() {
 	api.Get("/vehicles", VehicleController.GetVehiclesHandler)
 	api.Delete("/vehicles/:id", VehicleController.DeleteVehicleHandler)
 	api.Put("/vehicles/:id", VehicleController.UpdateVehicleHandler)
+
+	api.Post("/parking-spaces", ParkingSpaceController.AddParkingSpaceHandler)
 }
