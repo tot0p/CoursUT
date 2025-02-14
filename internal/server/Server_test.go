@@ -40,3 +40,13 @@ func TestServer_Run(t *testing.T) {
 	}
 
 }
+
+func TestHandlers(t *testing.T) {
+	s := NewServer()
+	s.handlers()
+	// check all routes are registered
+	if s.fiberApp.HandlersCount() == 0 {
+		t.Errorf("No routes registered")
+	}
+
+}
