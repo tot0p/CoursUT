@@ -7,7 +7,6 @@ import (
 )
 
 func (serv *Server) handlers() {
-
 	// api group
 	api := serv.fiberApp.Group("/api")
 	api.Get("/ping", apiHandler.PingHandler)
