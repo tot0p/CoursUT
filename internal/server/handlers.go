@@ -12,4 +12,5 @@ func (serv *Server) handlers() {
 	api.Post("/vehicles", apiHandler.AddVehicleHandler)
 	api.Get("/vehicles", apiHandler.GetVehiclesHandler)
 	api.Delete("/vehicles/:id", apiHandler.DeleteVehicleHandler)
+	api.Put("/vehicles/:id", apiHandler.UpdateVehicleHandler)
 }
