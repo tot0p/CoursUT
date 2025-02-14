@@ -6,8 +6,7 @@ import (
 )
 
 func TestNewServer(t *testing.T) {
-	var s *Server
-	s = NewServer()
+	s := NewServer()
 	if s == nil {
 		t.Errorf("NewServer() = nil, want not nil")
 		return
