@@ -21,5 +21,8 @@ func (serv *Server) handlers() {
 	api.Delete("/parking-spaces/:id", ParkingSpaceController.DeleteParkingSpacesHandler)
 	api.Put("/parking-spaces/:id", ParkingSpaceController.UpdateParkingSpaceHandler)
 
+	api.Get("/reservations/:id", ReservationController.GetReservationHandler)
 	api.Post("/reservations", ReservationController.AddReservationHandler)
+	api.Post("/reservations/:id/start", ReservationController.StartReservationHandler)
+	api.Post("/reservations/:id/end", ReservationController.EndReservationHandler)
 }

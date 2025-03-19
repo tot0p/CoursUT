@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// AddReservationHandler is the handler at /api/parking-spaces for add a parking space
+// AddReservationHandler is the handler at /api/reservations to add a reservation
 func AddReservationHandler(c *fiber.Ctx) error {
 	// Body parsing
 	var Input api.ReservationInput

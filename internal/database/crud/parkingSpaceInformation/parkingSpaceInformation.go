@@ -10,7 +10,7 @@ import (
 func CreateParkingSpaceInformation(information *models.ParkingSpaceInformation) (*models.ParkingSpaceInformation, error) {
 	information.ArrivalTime = information.ArrivalTime.UTC()
 	information.DepartureTime = information.DepartureTime.UTC()
-	res := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space_information (parking_space_id, vehicle_id, arrival_time, parking_duration) VALUES (?, ?, ?, ?) RETURNING id;", information.ParkingSpaceID, information.VehicleID, information.ArrivalTime, information.ParkingDuration)
+	res := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space_information (parking_space_id, vehicle_id, arrival_time,departure_time, parking_duration) VALUES (?, ?, ?, ?, ?) RETURNING id;", information.ParkingSpaceID, information.VehicleID, information.ArrivalTime, information.DepartureTime, information.ParkingDuration)
 	err := res.Scan(&information.ID)
 	if err != nil {
 		return nil, err
@@ -24,6 +24,8 @@ func GetParkingSpaceInformation(id int) (*models.ParkingSpaceInformation, error)
 	if err != nil {
 		return nil, err
 	}
+	information.ArrivalTime = information.ArrivalTime.UTC()
+	information.DepartureTime = information.DepartureTime.UTC()
 	return &information, nil
 }
 
@@ -40,6 +42,8 @@ func GetParkingSpaceInformations() ([]models.ParkingSpaceInformation, error) {
 		if err != nil {
 			return nil, err
 		}
+		information.ArrivalTime = information.ArrivalTime.UTC()
+		information.DepartureTime = information.DepartureTime.UTC()
 		informations = append(informations, information)
 	}
 	if err := rows.Err(); err != nil {
