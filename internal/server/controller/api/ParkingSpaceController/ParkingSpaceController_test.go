@@ -38,7 +38,7 @@ func TestGetParkingSpacesHandler(t *testing.T) {
 			expectedError: false,
 			body:          "",
 			expectedCode:  200,
-			expectedBody:  "[{\"id\":1,\"space_number\":\"A001\"}]",
+			expectedBody:  "[{\"id\":1,\"vehicle_type\":0,\"space_number\":\"A001\"}]",
 		},
 	}
 	err := database.InitDatabase()
@@ -90,9 +90,9 @@ func TestAddVehicleHandler(t *testing.T) {
 		{
 			description:   "Working request add parking space",
 			expectedError: false,
-			body:          "{\"space_number\":\"A001\"}",
+			body:          "{\"space_number\":\"A001\",\"vehicle_type\":1}",
 			expectedCode:  201,
-			expectedBody:  "{\"id\":1,\"space_number\":\"A001\"}",
+			expectedBody:  "{\"id\":1,\"vehicle_type\":1,\"space_number\":\"A001\"}",
 		},
 		{
 			description:   "Bad request add parking space",

@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"github.com/tot0p/CoursUT/internal/database"
 	"github.com/tot0p/CoursUT/internal/models"
-	"time"
 )
 
 func CreateParkingSpaceInformation(information *models.ParkingSpaceInformation) (*models.ParkingSpaceInformation, error) {
-	information.ArrivalTime = time.Now()
 	information.ArrivalTime = information.ArrivalTime.UTC()
 	information.DepartureTime = information.DepartureTime.UTC()
 	res := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space_information (parking_space_id, vehicle_id, arrival_time, parking_duration) VALUES (?, ?, ?, ?) RETURNING id;", information.ParkingSpaceID, information.VehicleID, information.ArrivalTime, information.ParkingDuration)
