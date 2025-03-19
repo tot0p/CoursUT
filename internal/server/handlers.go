@@ -25,4 +25,6 @@ func (serv *Server) handlers() {
 	api.Post("/reservations", ReservationController.AddReservationHandler)
 	api.Post("/reservations/:id/start", ReservationController.StartReservationHandler)
 	api.Post("/reservations/:id/end", ReservationController.EndReservationHandler)
+	api.Get("/reservations/:id/remaining-time", ReservationController.GetRemainingTimeHandler)
+	api.Get("/reservations/:id/qrcode", ReservationController.GetReservationQrCodeHandler)
 }

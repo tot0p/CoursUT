@@ -212,7 +212,7 @@ func TestGetReservationHandler(t *testing.T) {
 	}
 }
 func TestStartReservationHandler(t *testing.T) {
-	var route = "/api/reservations/start/:id"
+	var route = "/api/reservations/:id/start"
 	tests := []struct {
 		description   string
 		id            string
@@ -280,7 +280,7 @@ func TestStartReservationHandler(t *testing.T) {
 	for _, test := range tests {
 		req, _ := http.NewRequest(
 			"POST",
-			"/api/reservations/start/"+test.id,
+			"/api/reservations/"+test.id+"/start",
 			nil,
 		)
 		req.Header.Set("Content-Type", "application/json")
@@ -294,7 +294,7 @@ func TestStartReservationHandler(t *testing.T) {
 		assert.Nilf(t, err, test.description)
 		if test.regexCheck {
 			// We can't predict the exact time, so we just check the format
-			assert.Regexpf(t, `{"id":1,"vehicle_id":1,"parking_space_id":1,"arrival_time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z","departure_time":"0001-01-01T00:00:00Z","parking_duration":3600000000000}`, string(body), test.description)
+			assert.Regexpf(t, `{"id":1,"vehicle_id":1,"parking_space_id":1,"arrival_time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{1,6}Z","departure_time":"0001-01-01T00:00:00Z","parking_duration":3600000000000}`, string(body), test.description)
 		} else {
 			assert.Equalf(t, test.expectedBody, string(body), test.description)
 		}
@@ -302,7 +302,7 @@ func TestStartReservationHandler(t *testing.T) {
 }
 
 func TestEndReservationHandler(t *testing.T) {
-	var route = "/api/reservations/end/:id"
+	var route = "/api/reservations/:id/end"
 	tests := []struct {
 		description   string
 		id            string
@@ -370,7 +370,7 @@ func TestEndReservationHandler(t *testing.T) {
 	for _, test := range tests {
 		req, _ := http.NewRequest(
 			"POST",
-			"/api/reservations/end/"+test.id,
+			"/api/reservations/"+test.id+"/end",
 			nil,
 		)
 		req.Header.Set("Content-Type", "application/json")
@@ -384,14 +384,14 @@ func TestEndReservationHandler(t *testing.T) {
 		assert.Nilf(t, err, test.description)
 		if test.regexCheck {
 			// We can't predict the exact time, so we just check the format
-			assert.Regexpf(t, `{"id":1,"vehicle_id":1,"parking_space_id":1,"arrival_time":"0001-01-01T00:00:00Z","departure_time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z","parking_duration":3600000000000}`, string(body), test.description)
+			assert.Regexpf(t, `{"id":1,"vehicle_id":1,"parking_space_id":1,"arrival_time":"0001-01-01T00:00:00Z","departure_time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{1,6}Z","parking_duration":3600000000000}`, string(body), test.description)
 		} else {
 			assert.Equalf(t, test.expectedBody, string(body), test.description)
 		}
 	}
 }
 func TestGetRemainingTimeHandler(t *testing.T) {
-	var route = "/api/reservations/remaining-time/:id"
+	var route = "/api/reservations/:id/remaining-time"
 	tests := []struct {
 		description   string
 		id            string
@@ -454,12 +454,12 @@ func TestGetRemainingTimeHandler(t *testing.T) {
 
 	app := fiber.New()
 	app.Get(route, GetRemainingTimeHandler)
-	app.Post("/api/reservations/start/:id", StartReservationHandler)
+	app.Post("/api/reservations/:id/start", StartReservationHandler)
 
 	// start the reservation
 	req, _ := http.NewRequest(
 		"POST",
-		"/api/reservations/start/1",
+		"/api/reservations/1/start",
 		nil,
 	)
 	req.Header.Set("Content-Type", "application/json")
@@ -468,7 +468,7 @@ func TestGetRemainingTimeHandler(t *testing.T) {
 	for _, test := range tests {
 		req, _ := http.NewRequest(
 			"GET",
-			"/api/reservations/remaining-time/"+test.id,
+			"/api/reservations/"+test.id+"/remaining-time",
 			nil,
 		)
 		req.Header.Set("Content-Type", "application/json")
@@ -481,5 +481,93 @@ func TestGetRemainingTimeHandler(t *testing.T) {
 		body, err := io.ReadAll(res.Body)
 		assert.Nilf(t, err, test.description)
 		assert.Equalf(t, test.expectedBody, string(body), test.description)
+	}
+}
+
+func TestGetReservationQrCodeHandler(t *testing.T) {
+	var route = "/api/reservations/:id/qrcode"
+	tests := []struct {
+		description   string
+		id            string
+		expectedError bool
+		expectedCode  int
+		expectedBody  string
+	}{
+		{
+			description:   "Valid reservation ID",
+			id:            "1",
+			expectedError: false,
+			expectedCode:  200,
+			expectedBody:  "", // We can't predict the exact QR code content
+		},
+		{
+			description:   "Invalid reservation ID",
+			id:            "invalid",
+			expectedError: false,
+			expectedCode:  400,
+			expectedBody:  "{\"error\":\"Invalid reservation ID\"}",
+		},
+		{
+			description:   "Non-existent reservation ID",
+			id:            "999",
+			expectedError: false,
+			expectedCode:  404,
+			expectedBody:  "{\"error\":\"Reservation not found\"}",
+		},
+	}
+
+	err := database.InitDatabase()
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = vehicle.CreateVehicle(&models.Vehicle{
+		Plate:       "AA-123-AA",
+		VehicleType: models.Car,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = parkingSpace.CreateParkingSpace(&models.ParkingSpace{
+		SpaceNumber: "A001",
+		VehicleType: models.Car,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = parkingSpaceInformation.CreateParkingSpaceInformation(&models.ParkingSpaceInformation{
+		ParkingSpaceID:  1,
+		VehicleID:       1,
+		ParkingDuration: time.Hour,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	app := fiber.New()
+	app.Get(route, GetReservationQrCodeHandler)
+	for _, test := range tests {
+		req, _ := http.NewRequest(
+			"GET",
+			"/api/reservations/"+test.id+"/qrcode",
+			nil,
+		)
+		req.Header.Set("Content-Type", "application/json")
+		res, err := app.Test(req, -1)
+		assert.Equalf(t, test.expectedError, err != nil, test.description)
+		if test.expectedError {
+			continue
+		}
+		assert.Equalf(t, test.expectedCode, res.StatusCode, test.description)
+		body, err := io.ReadAll(res.Body)
+		assert.Nilf(t, err, test.description)
+		if test.expectedCode == 200 {
+			assert.NotEmpty(t, body, test.description)
+			assert.Nilf(t, err, test.description)
+		} else {
+			assert.Equalf(t, test.expectedBody, string(body), test.description)
+		}
 	}
 }
