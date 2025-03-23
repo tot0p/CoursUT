@@ -28,7 +28,7 @@ func TestCreateParkingSpace(t *testing.T) {
 	assert.NotEmpty(t, parkingSpace.SpaceNumber)
 
 	var p models.ParkingSpace
-	err = database.Conn.QueryRowContext(context.Background(), "SELECT * FROM parking_space WHERE id = ?;", parkingSpace.ID).Scan(&p.ID, &p.SpaceNumber)
+	err = database.Conn.QueryRowContext(context.Background(), "SELECT * FROM parking_space WHERE id = ?;", parkingSpace.ID).Scan(&p.ID, &p.VehicleType, &p.SpaceNumber)
 	require.NoError(t, err)
 	assert.Equal(t, parkingSpace, p)
 }
@@ -53,6 +53,18 @@ func TestGetParkingSpace(t *testing.T) {
 	parkingSpace = *temp
 
 	p, err := GetParkingSpace(parkingSpace.ID)
+	require.NoError(t, err)
+	assert.Equal(t, parkingSpace, *p)
+}
+
+func TestGetAvailableParkingSpace(t *testing.T) {
+	defer setupDatabase(t)()
+
+	parkingSpace := models.ParkingSpace{SpaceNumber: "A32", VehicleType: models.Car}
+	_, err := CreateParkingSpace(&parkingSpace)
+	require.NoError(t, err)
+
+	p, err := GetAvailableParkingSpace(models.Car)
 	require.NoError(t, err)
 	assert.Equal(t, parkingSpace, *p)
 }

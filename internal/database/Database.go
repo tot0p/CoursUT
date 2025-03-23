@@ -101,6 +101,7 @@ func CreateTableParkingSpace() error {
 	CREATE SEQUENCE IF NOT EXISTS id_parking_space START 1;
 	CREATE TABLE IF NOT EXISTS parking_space (
 		id INT PRIMARY KEY DEFAULT NEXTVAL('id_parking_space'),
+	    vehicle_type INT NOT NULL,
 		space_number TEXT UNIQUE NOT NULL
 	);`
 	_, err := Conn.ExecContext(context.Background(), query)
