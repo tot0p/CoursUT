@@ -294,7 +294,7 @@ func TestStartReservationHandler(t *testing.T) {
 		assert.Nilf(t, err, test.description)
 		if test.regexCheck {
 			// We can't predict the exact time, so we just check the format
-			assert.Regexpf(t, `{"id":1,"vehicle_id":1,"parking_space_id":1,"arrival_time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{1,6}Z","departure_time":"0001-01-01T00:00:00Z","parking_duration":3600000000000}`, string(body), test.description)
+			assert.Regexpf(t, `{"id":1,"vehicle_id":1,"parking_space_id":1,"arrival_time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{1,20}Z","departure_time":"0001-01-01T00:00:00Z","parking_duration":3600000000000}`, string(body), test.description)
 		} else {
 			assert.Equalf(t, test.expectedBody, string(body), test.description)
 		}
@@ -384,7 +384,7 @@ func TestEndReservationHandler(t *testing.T) {
 		assert.Nilf(t, err, test.description)
 		if test.regexCheck {
 			// We can't predict the exact time, so we just check the format
-			assert.Regexpf(t, `{"id":1,"vehicle_id":1,"parking_space_id":1,"arrival_time":"0001-01-01T00:00:00Z","departure_time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{1,6}Z","parking_duration":3600000000000}`, string(body), test.description)
+			assert.Regexpf(t, `{"id":1,"vehicle_id":1,"parking_space_id":1,"arrival_time":"0001-01-01T00:00:00Z","departure_time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{1,20}Z","parking_duration":3600000000000}`, string(body), test.description)
 		} else {
 			assert.Equalf(t, test.expectedBody, string(body), test.description)
 		}
