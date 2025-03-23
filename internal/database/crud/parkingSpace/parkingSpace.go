@@ -8,7 +8,7 @@ import (
 )
 
 func CreateParkingSpace(parkingSpace *models.ParkingSpace) (*models.ParkingSpace, error) {
-	res := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space (space_number) VALUES (?) RETURNING id;", parkingSpace.SpaceNumber)
+	res := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space (space_number,vehicle_type) VALUES (?, ?) RETURNING id;", parkingSpace.SpaceNumber, parkingSpace.VehicleType)
 	err := res.Scan(&parkingSpace.ID)
 	if err != nil {
 		return nil, err
@@ -18,7 +18,16 @@ func CreateParkingSpace(parkingSpace *models.ParkingSpace) (*models.ParkingSpace
 
 func GetParkingSpace(id int) (*models.ParkingSpace, error) {
 	parkingSpace := models.ParkingSpace{}
-	err := database.Conn.QueryRowContext(context.Background(), "SELECT * FROM parking_space WHERE id = ?;", id).Scan(&parkingSpace.ID, &parkingSpace.SpaceNumber)
+	err := database.Conn.QueryRowContext(context.Background(), "SELECT * FROM parking_space WHERE id = ?;", id).Scan(&parkingSpace.ID, &parkingSpace.VehicleType, &parkingSpace.SpaceNumber)
+	if err != nil {
+		return nil, err
+	}
+	return &parkingSpace, nil
+}
+
+func GetAvailableParkingSpace(vehicleType models.VehicleType) (*models.ParkingSpace, error) {
+	parkingSpace := models.ParkingSpace{}
+	err := database.Conn.QueryRowContext(context.Background(), "SELECT * FROM parking_space WHERE vehicle_type = ? AND id NOT IN (SELECT parking_space_id FROM parking_space_information) LIMIT 1;", vehicleType).Scan(&parkingSpace.ID, &parkingSpace.VehicleType, &parkingSpace.SpaceNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +43,7 @@ func GetParkingSpaces() ([]models.ParkingSpace, error) {
 	var parkingSpaces []models.ParkingSpace
 	for rows.Next() {
 		parkingSpace := models.ParkingSpace{}
-		err = rows.Scan(&parkingSpace.ID, &parkingSpace.SpaceNumber)
+		err = rows.Scan(&parkingSpace.ID, &parkingSpace.VehicleType, &parkingSpace.SpaceNumber)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +83,7 @@ func UpdateParkingSpace(parkingSpace *models.ParkingSpace) error {
 	if count == 0 {
 		return fmt.Errorf("parking space with id %d not found", parkingSpace.ID)
 	}
-	res2 := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space (id, space_number) VALUES (?, ?) RETURNING id;", parkingSpace.ID, parkingSpace.SpaceNumber)
+	res2 := database.Conn.QueryRowContext(context.Background(), "INSERT INTO parking_space (id, space_number, vehicle_type) VALUES (?, ?, ?) RETURNING id;", parkingSpace.ID, parkingSpace.SpaceNumber, parkingSpace.VehicleType)
 	err = res2.Scan(&parkingSpace.ID)
 	if err != nil {
 		return err

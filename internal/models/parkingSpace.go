@@ -1,10 +1,13 @@
 package models
 
-import "regexp"
+import (
+	"regexp"
+)
 
 type ParkingSpace struct {
-	ID          int    `json:"id" db:"id"`
-	SpaceNumber string `json:"space_number" db:"space_number"`
+	ID          int         `json:"id" db:"id"`
+	VehicleType VehicleType `json:"vehicle_type" db:"vehicle_type"`
+	SpaceNumber string      `json:"space_number" db:"space_number"`
 }
 
 // Format parking letter and 1 - 3 digits number (ex: A001, B123, C999)
