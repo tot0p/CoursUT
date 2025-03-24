@@ -571,3 +571,115 @@ func TestGetReservationQrCodeHandler(t *testing.T) {
 		}
 	}
 }
+
+func TestGetReservationPriceHandler(t *testing.T) {
+	var route = "/api/reservations/:id/price"
+	tests := []struct {
+		description   string
+		id            string
+		expectedError bool
+		expectedCode  int
+		expectedBody  string
+	}{
+		{
+			description:   "Valid reservation ID",
+			id:            "1",
+			expectedError: false,
+			expectedCode:  200,
+			expectedBody:  "{\"price\":4}",
+		},
+		{
+			description:   "Valid reservation ID",
+			id:            "2",
+			expectedError: false,
+			expectedCode:  200,
+			expectedBody:  "{\"price\":80}",
+		},
+		{
+			description:   "Invalid reservation ID",
+			id:            "invalid",
+			expectedError: false,
+			expectedCode:  400,
+			expectedBody:  "{\"error\":\"Invalid ID\"}",
+		},
+		{
+			description:   "Non-existent reservation ID",
+			id:            "999",
+			expectedError: false,
+			expectedCode:  400,
+			expectedBody:  "{\"error\":\"Cannot get reservation\"}",
+		},
+	}
+
+	err := database.InitDatabase()
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = vehicle.CreateVehicle(&models.Vehicle{
+		Plate:       "AA-123-AA",
+		VehicleType: models.Car,
+	})
+	if err != nil {
+		panic(err)
+	}
+	_, err = vehicle.CreateVehicle(&models.Vehicle{
+		Plate:       "BB-123-BB",
+		VehicleType: models.Truck,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = parkingSpace.CreateParkingSpace(&models.ParkingSpace{
+		SpaceNumber: "A001",
+		VehicleType: models.Car,
+	})
+	if err != nil {
+		panic(err)
+	}
+	_, err = parkingSpace.CreateParkingSpace(&models.ParkingSpace{
+		SpaceNumber: "A002",
+		VehicleType: models.Truck,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = parkingSpaceInformation.CreateParkingSpaceInformation(&models.ParkingSpaceInformation{
+		ParkingSpaceID:  1,
+		VehicleID:       1,
+		ParkingDuration: time.Hour,
+	})
+	if err != nil {
+		panic(err)
+	}
+	_, err = parkingSpaceInformation.CreateParkingSpaceInformation(&models.ParkingSpaceInformation{
+		ParkingSpaceID:  2,
+		VehicleID:       2,
+		ParkingDuration: 10 * time.Hour,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	app := fiber.New()
+	app.Get(route, GetReservationPriceHandler)
+	for _, test := range tests {
+		req, _ := http.NewRequest(
+			"GET",
+			"/api/reservations/"+test.id+"/price",
+			nil,
+		)
+		req.Header.Set("Content-Type", "application/json")
+		res, err := app.Test(req, -1)
+		assert.Equalf(t, test.expectedError, err != nil, test.description)
+		if test.expectedError {
+			continue
+		}
+		assert.Equalf(t, test.expectedCode, res.StatusCode, test.description)
+		body, err := io.ReadAll(res.Body)
+		assert.Nilf(t, err, test.description)
+		assert.Equalf(t, test.expectedBody, string(body), test.description)
+	}
+}
