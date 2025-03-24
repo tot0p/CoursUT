@@ -31,9 +31,9 @@ func GetDegresiveParkingPrice(vehicleType VehicleType, duration time.Duration) i
 	// the price is degresive the more hour you stay
 	price := GetVehicleHourPrice(vehicleType)
 	// degresive coefficient
-	coef := 1.0
+	var coef = 1.0
 	hours := int(duration.Hours())
-	coef = 1.0 - (float64(hours) / 30.0)
+	coef = coef - (float64(hours) / 30.0)
 	if coef < 0.5 {
 		coef = 0.5
 	}
