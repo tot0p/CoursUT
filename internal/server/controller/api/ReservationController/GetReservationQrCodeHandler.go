@@ -55,6 +55,7 @@ func GetReservationQrCodeHandler(c *fiber.Ctx) error {
 	if err := qrCode.Save(writer); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to write QR code to buffer"})
 	}
-
+	//set the content type to image/png
+	c.Set(fiber.HeaderContentType, "image/png")
 	return c.Status(fiber.StatusOK).Send(buf.Bytes())
 }
