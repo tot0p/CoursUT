@@ -20,8 +20,6 @@ RUN gofmt -s -w .
 # go mod download
 RUN go mod download
 
-RUN ls -la
-
 # Build the Go app
 RUN go build -o main cmd/App/main.go
 # Expose port 8080 to the outside world
