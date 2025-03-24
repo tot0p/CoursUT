@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/gofiber/fiber/v2"
 	apiHandler "github.com/tot0p/CoursUT/internal/server/controller/api"
 	"github.com/tot0p/CoursUT/internal/server/controller/api/ParkingSpaceController"
 	"github.com/tot0p/CoursUT/internal/server/controller/api/ReservationController"
@@ -28,4 +29,19 @@ func (serv *Server) handlers() {
 	api.Get("/reservations/:id/remaining-time", ReservationController.GetRemainingTimeHandler)
 	api.Get("/reservations/:id/qrcode", ReservationController.GetReservationQrCodeHandler)
 	api.Get("/reservations/:id/price", ReservationController.GetReservationPriceHandler)
+
+	// Serve Swagger JSON
+	serv.fiberApp.Get("/swagger/swagger.json", func(c *fiber.Ctx) error {
+		return c.SendFile("./docs/swagger/swagger.json")
+	})
+
+	serv.fiberApp.Get("/swagger/", func(c *fiber.Ctx) error {
+		return c.SendFile("./docs/swagger-ui/index.html")
+	})
+	serv.fiberApp.Get("/swagger/swagger-ui.js", func(c *fiber.Ctx) error {
+		return c.SendFile("./docs/swagger-ui/swagger-ui.js")
+	})
+	serv.fiberApp.Get("/swagger/swagger-custom.css", func(c *fiber.Ctx) error {
+		return c.SendFile("./docs/swagger-ui/swagger-custom.css")
+	})
 }

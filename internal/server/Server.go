@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"log"
 )
@@ -18,6 +19,9 @@ func NewServer() *Server {
 		Format:     "[${time}] ${status} - ${method} ${path}\n",
 		TimeFormat: "02-Jan-2006 15:04:05",
 		TimeZone:   "Local",
+	}))
+	serv.fiberApp.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
 	}))
 	serv.handlers()
 	return serv

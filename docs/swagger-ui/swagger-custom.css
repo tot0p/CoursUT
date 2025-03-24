@@ -1,0 +1,34 @@
+/* Custom styles for Swagger UI */
+.swagger-ui .topbar {
+  background-color: #1E5180;
+}
+
+.swagger-ui .info .title {
+  color: #333;
+}
+
+.swagger-ui .opblock.opblock-get {
+  background-color: rgba(97, 175, 254, 0.1);
+}
+
+.swagger-ui .opblock.opblock-post {
+  background-color: rgba(73, 204, 144, 0.1);
+}
+
+.swagger-ui .opblock.opblock-put {
+  background-color: rgba(252, 161, 48, 0.1);
+}
+
+.swagger-ui .opblock.opblock-delete {
+  background-color: rgba(249, 62, 62, 0.1);
+}
+
+/* Improve readability of the API documentation */
+.swagger-ui .markdown p, .swagger-ui .markdown li {
+  font-size: 14px;
+}
+
+/* Improve the response section visibility */
+.swagger-ui .responses-inner h4, .swagger-ui .responses-inner h5 {
+  font-size: 16px;
+}

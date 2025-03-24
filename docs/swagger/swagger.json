@@ -1,0 +1,957 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Parking Management API",
+    "description": "API for managing a smart parking system with vehicle registration, parking space allocation, and reservation management",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "ping",
+      "description": "Health check endpoint"
+    },
+    {
+      "name": "vehicles",
+      "description": "Operations about vehicles"
+    },
+    {
+      "name": "parking-spaces",
+      "description": "Operations about parking spaces"
+    },
+    {
+      "name": "reservations",
+      "description": "Operations about parking reservations"
+    }
+  ],
+  "paths": {
+    "/api/ping": {
+      "get": {
+        "tags": ["ping"],
+        "summary": "Ping API",
+        "description": "Check if the API is running",
+        "operationId": "pingAPI",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "pong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicles": {
+      "get": {
+        "tags": ["vehicles"],
+        "summary": "Get all vehicles",
+        "description": "Returns a list of all vehicles",
+        "operationId": "getVehicles",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Vehicle"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No vehicles found"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["vehicles"],
+        "summary": "Add a new vehicle",
+        "description": "Add a new vehicle to the system",
+        "operationId": "addVehicle",
+        "requestBody": {
+          "description": "Vehicle object that needs to be added",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Vehicle created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vehicle"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicles/{id}": {
+      "delete": {
+        "tags": ["vehicles"],
+        "summary": "Delete a vehicle",
+        "description": "Delete a vehicle by ID",
+        "operationId": "deleteVehicle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Vehicle ID to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Vehicle deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["vehicles"],
+        "summary": "Update a vehicle",
+        "description": "Update a vehicle by ID",
+        "operationId": "updateVehicle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Vehicle ID to update",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Vehicle object that needs to be updated",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Vehicle updated successfully"
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parking-spaces": {
+      "get": {
+        "tags": ["parking-spaces"],
+        "summary": "Get all parking spaces",
+        "description": "Returns a list of all parking spaces",
+        "operationId": "getParkingSpaces",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ParkingSpace"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No parking spaces found"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["parking-spaces"],
+        "summary": "Add a new parking space",
+        "description": "Add a new parking space to the system",
+        "operationId": "addParkingSpace",
+        "requestBody": {
+          "description": "Parking space object that needs to be added",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParkingSpace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Parking space created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParkingSpace"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parking-spaces/{id}": {
+      "delete": {
+        "tags": ["parking-spaces"],
+        "summary": "Delete a parking space",
+        "description": "Delete a parking space by ID",
+        "operationId": "deleteParkingSpace",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Parking space ID to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Parking space deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parking space not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["parking-spaces"],
+        "summary": "Update a parking space",
+        "description": "Update a parking space by ID",
+        "operationId": "updateParkingSpace",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Parking space ID to update",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Parking space object that needs to be updated",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParkingSpace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Parking space updated successfully"
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations": {
+      "post": {
+        "tags": ["reservations"],
+        "summary": "Add a new reservation",
+        "description": "Create a new reservation for a vehicle",
+        "operationId": "addReservation",
+        "requestBody": {
+          "description": "Reservation object that needs to be added",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Reservation created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParkingSpaceInformation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or no available parking space",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}": {
+      "get": {
+        "tags": ["reservations"],
+        "summary": "Get reservation by ID",
+        "description": "Returns a single reservation",
+        "operationId": "getReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of reservation to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParkingSpaceInformation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied or cannot get reservation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/start": {
+      "post": {
+        "tags": ["reservations"],
+        "summary": "Start a reservation",
+        "description": "Start a reservation by setting its arrival time to now",
+        "operationId": "startReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of reservation to start",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParkingSpaceInformation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reservation ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to start reservation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/end": {
+      "post": {
+        "tags": ["reservations"],
+        "summary": "End a reservation",
+        "description": "End a reservation by setting its departure time to now and deleting it",
+        "operationId": "endReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of reservation to end",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation ended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParkingSpaceInformation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reservation ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to end reservation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/remaining-time": {
+      "get": {
+        "tags": ["reservations"],
+        "summary": "Get remaining time for a reservation",
+        "description": "Returns the remaining time for a reservation",
+        "operationId": "getRemainingTime",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of reservation",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "remaining_time": {
+                      "type": "string",
+                      "example": "59m59s"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reservation ID or not started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/qrcode": {
+      "get": {
+        "tags": ["reservations"],
+        "summary": "Get QR code for a reservation",
+        "description": "Returns a QR code for the reservation",
+        "operationId": "getQRCode",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of reservation",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reservation ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to generate QR code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/price": {
+      "get": {
+        "tags": ["reservations"],
+        "summary": "Get price for a reservation",
+        "description": "Returns the calculated price for a reservation",
+        "operationId": "getReservationPrice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of reservation",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "integer",
+                      "example": 4
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID or cannot get reservation/vehicle",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "VehicleType": {
+        "type": "integer",
+        "enum": [0, 1, 2],
+        "description": "0 = Unknown, 1 = Car, 2 = Truck"
+      },
+      "Vehicle": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "plate": {
+            "type": "string",
+            "example": "AA-123-AA"
+          },
+          "vehicleType": {
+            "$ref": "#/components/schemas/VehicleType"
+          }
+        }
+      },
+      "VehicleInput": {
+        "type": "object",
+        "required": ["plate", "vehicleType"],
+        "properties": {
+          "plate": {
+            "type": "string",
+            "example": "AA-123-AA",
+            "description": "License plate of the vehicle"
+          },
+          "vehicleType": {
+            "$ref": "#/components/schemas/VehicleType"
+          }
+        }
+      },
+      "ParkingSpace": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "vehicle_type": {
+            "$ref": "#/components/schemas/VehicleType"
+          },
+          "space_number": {
+            "type": "string",
+            "example": "A001",
+            "description": "Format: letter followed by 1-3 digits (e.g., A001, B123, C999)"
+          }
+        }
+      },
+      "ParkingSpaceInformation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "vehicle_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "parking_space_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "arrival_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-03-24T10:30:00Z"
+          },
+          "departure_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-03-24T11:30:00Z"
+          },
+          "parking_duration": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3600000000000,
+            "description": "Duration in nanoseconds"
+          }
+        }
+      },
+      "ReservationInput": {
+        "type": "object",
+        "required": ["vehicle_id", "reservation_time"],
+        "properties": {
+          "vehicle_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1,
+            "description": "ID of the vehicle for the reservation"
+          },
+          "reservation_time": {
+            "type": "string",
+            "example": "1h",
+            "description": "Duration string (e.g., '1h', '30m', '2h30m')"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          }
+        }
+      }
+    }
+  }
+}
