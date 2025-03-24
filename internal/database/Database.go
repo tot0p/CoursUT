@@ -15,7 +15,7 @@ var Conn dbConn
 // InitDatabase initializes the database
 func InitDatabase() error {
 	var err error
-	db, err := sql.Open("duckdb", "./database.db")
+	db, err := sql.Open("duckdb", "")
 	if err != nil {
 		return err
 	}
